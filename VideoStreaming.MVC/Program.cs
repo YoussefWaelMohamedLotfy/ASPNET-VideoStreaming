@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.StaticFiles;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,7 +16,18 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
+// Set up custom content types - associating file extension to MIME type
+var provider = new FileExtensionContentTypeProvider();
+
+// Add new mappings
+provider.Mappings[".mpd"] = "application/dash+xml";
+provider.Mappings[".m4s"] = "video/iso.segment";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
 
 app.UseRouting();
 
