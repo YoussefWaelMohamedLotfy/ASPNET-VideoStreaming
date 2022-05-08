@@ -12,7 +12,7 @@
         </p>
     </div>
 </div>
-<div>
+<section>
     <h2>Basic Video Streaming</h2>
     <div class="code">
         <video width="1000" height="600" data-dashjs-player="" autoplay controls loop>
@@ -20,8 +20,19 @@
             Your browser does not support the video tag.
         </video>
     </div>
-</div>
-<div>
+    <h4>Source Code:</h4>
+    <div class="highlight w-75">
+        <pre>
+            <code class="language-html">
+                &lt;video width="1000" height="600" data-dashjs-player="" autoplay controls loop&gt;
+                    &lt;source src="~/content/output/finalsamplevid.mpd" type="application/dash+xml"&gt;
+                    Your browser does not support the video tag.
+                &lt;/video&gt;
+            </code>
+        </pre>
+    </div>
+</section>
+<section>
     <h2>Video Streaming with Subtitles</h2>
     <div class="code">
         <video width="1000" height="600" data-dashjs-player="" autoplay controls>
@@ -29,4 +40,15 @@
             Your browser does not support the video tag.
         </video>
     </div>
-</div>
+    <h4>Source Code:</h4>
+    <div class="highlight w-75">
+        <pre>
+            <code class="language-html">
+                &lt;video width="1000" height="600" data-dashjs-player="" autoplay controls&gt;
+                    &lt;source src="~/content/outputwithsubtitles/stream.mpd" type="application/dash+xml"&gt;
+                    Your browser does not support the video tag.
+                &lt;/video&gt;
+            </code>
+        </pre>
+    </div>
+</section>
