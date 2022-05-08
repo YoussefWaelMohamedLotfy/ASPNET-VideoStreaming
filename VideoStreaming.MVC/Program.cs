@@ -23,6 +23,7 @@ var provider = new FileExtensionContentTypeProvider();
 // Add new mappings
 provider.Mappings[".mpd"] = "application/dash+xml";
 provider.Mappings[".m4s"] = "video/iso.segment";
+provider.Mappings[".vtt"] = "text/vtt";
 
 app.UseStaticFiles(new StaticFileOptions
 {

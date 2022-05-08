@@ -13,9 +13,19 @@
     </div>
 </div>
 <div>
+    <h2>Basic Video Streaming</h2>
+    <div class="code">
+        <video width="1000" height="600" data-dashjs-player="" autoplay controls loop>
+            <source src="~/content/output/finalsamplevid.mpd" type="application/dash+xml">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+<div>
+    <h2>Video Streaming with Subtitles</h2>
     <div class="code">
         <video width="1000" height="600" data-dashjs-player="" autoplay controls>
-            <source src="~/content/output/finalsamplevid.mpd" type="application/dash+xml">
+            <source src="~/content/outputwithsubtitles/stream.mpd" type="application/dash+xml">
             Your browser does not support the video tag.
         </video>
     </div>
