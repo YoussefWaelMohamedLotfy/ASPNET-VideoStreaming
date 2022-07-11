@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adaptive Media Player (FFmpeg)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mux.js/6.2.0/mux.min.js"
+            integrity="sha512-9VtQ5XTyfOzaheGDZDiyJJQAbo3LRtaguZtl31k130VPr2OII5Ql98R/PV0hrMvJ8dpYS4e62RigbTTrNWsbfA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/shaka-player/4.1.1/shaka-player.ui.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/shaka-player/4.1.1/controls.css">
+    <style>
+        .content {
+            margin: auto;
+        }
+
+        .controls {
+            margin: auto;
+        }
+
+        #urlTextBox {
+            width: 70%;
+        }
+
+        #videoWrapperDiv {
+            border: 1px solid gray;
+            width: 100%;
+        }
+    </style>
+    <script>
+        let player = undefined;
+        let availableHeights = [];
+
+        async function init() {
+            // When using the UI, the player is made automatically by the UI object.
+            const video = document.getElementById('videoElement');
+            const ui = video['ui'];
+
+            const controls = ui.getControls();
+            player = controls.getPlayer();
+
+            // Attach player and ui to the window to make it easy to access in the JS console.
+            window.player = player;
+            window.ui = ui;
+
+            // Listen for error events.
+            player.addEventListener('error', onPlayerErrorEvent);
+            player.addEventListener('streaming', onStreamingEvent);
+            controls.addEventListener('error', onUIErrorEvent);
+
+            onResize();
+        }
+
+        function onStreamingEvent() {
+            if (player) {
+                const variants = player.getVariantTracks();
+                if (variants) {
+                    availableHeights = variants.map(v => v.height).sort();
+                }
+            }
+        }
+
+        function onPlayerErrorEvent(errorEvent) {
+            // Extract the shaka.util.Error object from the event.
+            onPlayerError(event.detail);
+        }
+
+        function onPlayerError(error) {
+            // Handle player error
+            console.error('Error code', error.code, 'object', error);
+        }
+
+        function onUIErrorEvent(errorEvent) {
+            // Extract the shaka.util.Error object from the event.
+            onPlayerError(event.detail);
+        }
+
+        function initFailed(errorEvent) {
+            // Handle the failure to load; errorEvent.detail.reasonCode has a
+            // shaka.ui.FailReasonCode describing why.
+            console.error('Unable to load the UI library!');
+        }
+
+        // Listen to the custom shaka-ui-loaded event, to wait until the UI is loaded.
+        document.addEventListener('shaka-ui-loaded', init);
+
+        // Listen to the custom shaka-ui-load-failed event, in case Shaka Player fails
+        // to load (e.g. due to lack of browser support).
+        document.addEventListener('shaka-ui-load-failed', initFailed);
+
+        async function playMedia() {
+            // Try to load a manifest.
+            // This is an asynchronous process.
+            try {
+                await player.load(document.getElementById('urlTextBox').value);
+                // This runs if the asynchronous load is successful.
+                console.log('The video has now been loaded!');
+            } catch (e) {
+                // onError is executed if the asynchronous load fails.
+                onPlayerError(e);
+            }
+        }
+
+        function onResize() {
+            const videoElement = document.getElementById('videoElement');
+            const playerHeightSpan = document.getElementById('playerHeightSpan');
+            const currentPlayerHeight = videoElement.clientHeight;
+            playerHeightSpan.innerHTML = `Player height: ${currentPlayerHeight} px`;
+
+            let maxDesiredHeight = currentPlayerHeight;
+            if (player) {
+                if (availableHeights && availableHeights.length) {
+                    // find the first height that is greater than the current player height
+                    for (let i = 0; i < availableHeights.length; i++) {
+                        if (availableHeights[i] >= maxDesiredHeight) {
+                            maxDesiredHeight = availableHeights[i];
+                            break;
+                        }
+                    }
+
+                    if (maxDesiredHeight) {
+                        player.configure({
+                            restrictions: {
+                                maxHeight: maxDesiredHeight
+                            },
+                        });
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+  <body onresize="onResize()">
+    <div class="content">
+      <div class="controls">
+        <input id="urlTextBox" type="text" value="https://localhost:7189/content/NewStream/test3_stream.mpd" />
+        <input class="playButton" type="button" value="Play" onClick='playMedia()' />
+      </div>
+      <br />
+      <div id="videoWrapperDiv" data-shaka-player-container>
+        <video id="videoElement" data-shaka-player style="width:100%;height:100%" autoplay>
+        </video>
+      </div>
+      <span id="playerHeightSpan" />
+    </div>
+  </body>
+</html>
