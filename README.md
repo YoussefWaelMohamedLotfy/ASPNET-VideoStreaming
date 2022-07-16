@@ -1,7 +1,17 @@
 # Video Streaming in HTML5
+
 This repo shows how you can add Video Streaming to your ASP.NET Core App.
 
+## Table of Contents
+
++ [Understanding Video Streaming](#understanding-video-streaming)
++ [Video Content Preparation for streaming](#video-content-preparation-for-streaming)
+  + [Example Script for an `HLS+MPEG-DASH` Content](#example-script-for-an-hlsmpeg-dash-content)
++ [Enabling MIME Types for Streamed Content in ASP.NET Core](#enabling-mime-types-for-streamed-content-in-aspnet-core)
++ [References](#references)
+
 ## Understanding Video Streaming
+
 Normal MP4 (MPEG-4) videos are rendered in one resolution only, depending on the quality of camera and recording. The resolution can be converted with tools made for this purpose.
 
 When you put a video in an HTML5 `<video>` `src` attribute, The video is being loaded as a whole. Unlike in Adaptive Streaming, the video is loaded in chunks "Segments" that adjust to user's bandwidth.
@@ -42,7 +52,8 @@ When the content is prepared, the files that are used in the code are `nature.mp
 
 To display the Video Stream on your website, a MPEG-DASH client is required for playback of the stream. [Google Shaka Player](https://github.com/shaka-project/shaka-player) is used for this task. [dash.js](https://github.com/Dash-Industry-Forum/dash.js) can be used as an alternative. [dash.js Samples can be found on their website](https://reference.dashif.org/dash.js/latest/samples/index.html).
 
-## Enabling MIME Types for Streamed Content
+## Enabling MIME Types for Streamed Content in ASP.NET Core
+
 If you have prepared your content, added it to the HTML and run your app, the video will not work. Open the "Network" Tab of your browser's Dev Tools and you will find a bunch of `404 Not Found` responses of the streamed files. That's because the app cannot identify the file formats of the Segmented Video and `mpd` manifest file. You need to enable support for the streamed files format in your app.
 
 > Check this [Github issue #25](https://github.com/Dash-Industry-Forum/Ingest/issues/25) for MIME types of Streamed Content files.
@@ -69,6 +80,7 @@ app.UseStaticFiles(new StaticFileOptions
 With this configuration, you can view your Adaptive Streamed Content in your app.
 
 ## References
+
 + [KeyCDN Article "MPEG-DASH - Dynamic Adaptive Streaming Over HTTP" Explained](https://www.keycdn.com/support/mpeg-dash)
 + [What is MPEG-DASH Video Streaming Protocol? How Does MPEG-DASH Work? by OTTVerse](https://ottverse.com/mpeg-dash-video-streaming-the-complete-guide/)
 + [FFmpeg Recipes](https://ottverse.com/recipes-in-ffmpeg/)
