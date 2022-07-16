@@ -1,56 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Adaptive Streaming (FFmpeg)";
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adaptive Media Player (FFmpeg)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mux.js/6.2.0/mux.min.js"
+            integrity="sha512-9VtQ5XTyfOzaheGDZDiyJJQAbo3LRtaguZtl31k130VPr2OII5Ql98R/PV0hrMvJ8dpYS4e62RigbTTrNWsbfA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/shaka-player/4.1.1/shaka-player.ui.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/shaka-player/4.1.1/controls.css">
+    <style>
+        .content {
+            margin: auto;
+        }
 
-<div class="p-4 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">Video Streaming</h1>
-        <p class="col-md-7 fs-4">
-            In this demo, you will see how you can stream MP4 videos with MPEG-DASH format. Click
-            <a href="https://www.keycdn.com/support/mpeg-dash"> here</a>
-            to know more about Streaming.
-        </p>
-    </div>
-</div>
-<section>
-    <h2>Basic Video Streaming</h2>
-    <div class="pt-2 mb-4">
-        <div class="controls">
-            <form class="row row-cols-lg-auto g-3 align-items-center">
-                <div class="col-12 w-50">
-                    <div class="input-group">
-                        <div class="input-group-text">
-                            <i class="bi bi-file-earmark-code"></i>
-                        </div>
-                        <input type="text" class="form-control" id="urlTextBox" placeholder=".mpd or .m3u8 URL" value="https://localhost:7189/content/NatureStream/nature.mpd">
-                    </div>
-                </div>
-                <div class="col-12">
-                    <input type="button" class="playButton btn btn-primary" value="Play" onClick='playMedia()' />
-                </div>
-            </form>
-        </div>
-        <div>
-            <p id="playerHeightSpan" />
-        </div>
-        <div data-shaka-player-container style="border: 1px solid gray;">
-            <video id="videoElement" data-shaka-player style="width:100%; height:100%" autoplay></video>
-        </div>
-    </div>
-    <h4>Source Code:</h4>
-    <div class="highlight w-75">
-        <pre>
-            <code class="language-html">
-                &lt;div data-shaka-player-container style="border: 1px solid gray;">
-                    &lt;video id="videoElement" data-shaka-player style="width:100%; height:100%" autoplay>&lt;/video>
-                &lt;/div>
-            </code>
-        </pre>
-    </div>
-</section>
+        .controls {
+            margin: auto;
+        }
 
-@section Scripts
-{
+        #urlTextBox {
+            width: 70%;
+        }
+
+        #videoWrapperDiv {
+            border: 1px solid gray;
+            width: 100%;
+        }
+    </style>
     <script>
         let player = undefined;
         let availableHeights = [];
@@ -153,4 +127,20 @@
             }
         }
     </script>
-}
+</head>
+
+  <body onresize="onResize()">
+    <div class="content">
+      <div class="controls">
+        <input id="urlTextBox" type="text" value="https://localhost:7189/content/NatureStream/nature.mpd" />
+        <input class="playButton" type="button" value="Play" onClick='playMedia()' />
+      </div>
+      <br />
+      <div id="videoWrapperDiv" data-shaka-player-container>
+        <video id="videoElement" data-shaka-player style="width:100%;height:100%" autoplay>
+        </video>
+      </div>
+      <span id="playerHeightSpan" />
+    </div>
+  </body>
+</html>
