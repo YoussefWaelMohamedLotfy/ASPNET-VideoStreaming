@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Adaptive Streaming (FFmpeg)";
 }
 
 <div class="p-4 mb-4 bg-light rounded-3">
@@ -14,41 +14,143 @@
 </div>
 <section>
     <h2>Basic Video Streaming</h2>
-    <div class="code">
-        <video width="1000" height="600" data-dashjs-player autoplay controls>
-            <source src="~/content/NewStream/test3_stream.mpd" type="application/dash+xml">
-            Your browser does not support the video tag.
-        </video>
+    <div class="pt-2 mb-4">
+        <div class="controls">
+            <form class="row row-cols-lg-auto g-3 align-items-center">
+                <div class="col-12 w-50">
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-file-earmark-code"></i>
+                        </div>
+                        <input type="text" class="form-control" id="urlTextBox" placeholder=".mpd or .m3u8 URL" value="https://localhost:7189/content/NatureStream/nature.mpd">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <input type="button" class="playButton btn btn-primary" value="Play" onClick='playMedia()' />
+                </div>
+            </form>
+        </div>
+        <div>
+            <p id="playerHeightSpan" />
+        </div>
+        <div data-shaka-player-container style="border: 1px solid gray;">
+            <video id="videoElement" data-shaka-player style="width:100%; height:100%" autoplay></video>
+        </div>
     </div>
     <h4>Source Code:</h4>
     <div class="highlight w-75">
         <pre>
             <code class="language-html">
-                &lt;video width="1000" height="600" data-dashjs-player="" autoplay controls loop&gt;
-                    &lt;source src="~/content/output/finalsamplevid.mpd" type="application/dash+xml"&gt;
-                    Your browser does not support the video tag.
-                &lt;/video&gt;
+                &lt;div data-shaka-player-container style="border: 1px solid gray;">
+                    &lt;video id="videoElement" data-shaka-player style="width:100%; height:100%" autoplay>&lt;/video>
+                &lt;/div>
             </code>
         </pre>
     </div>
 </section>
-@*<section>
-    <h2>Video Streaming with Subtitles</h2>
-    <div class="code">
-        <video width="1000" height="600" data-dashjs-player="" autoplay controls>
-            <source src="~/content/outputwithsubtitles/stream.mpd" type="application/dash+xml">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-    <h4>Source Code:</h4>
-    <div class="highlight w-75">
-        <pre>
-            <code class="language-html">
-                &lt;video width="1000" height="600" data-dashjs-player="" autoplay controls&gt;
-                    &lt;source src="~/content/outputwithsubtitles/stream.mpd" type="application/dash+xml"&gt;
-                    Your browser does not support the video tag.
-                &lt;/video&gt;
-            </code>
-        </pre>
-    </div>
-</section>*@
+
+@section Scripts
+{
+    <script>
+        let player = undefined;
+        let availableHeights = [];
+
+        async function init() {
+            // When using the UI, the player is made automatically by the UI object.
+            const video = document.getElementById('videoElement');
+            const ui = video['ui'];
+
+            const controls = ui.getControls();
+            player = controls.getPlayer();
+
+            // Attach player and ui to the window to make it easy to access in the JS console.
+            window.player = player;
+            window.ui = ui;
+
+            // Listen for error events.
+            player.addEventListener('error', onPlayerErrorEvent);
+            player.addEventListener('streaming', onStreamingEvent);
+            controls.addEventListener('error', onUIErrorEvent);
+
+            onResize();
+        }
+
+        function onStreamingEvent() {
+            if (player) {
+                const variants = player.getVariantTracks();
+                if (variants) {
+                    availableHeights = variants.map(v => v.height).sort();
+                }
+            }
+        }
+
+        function onPlayerErrorEvent(errorEvent) {
+            // Extract the shaka.util.Error object from the event.
+            onPlayerError(event.detail);
+        }
+
+        function onPlayerError(error) {
+            // Handle player error
+            console.error('Error code', error.code, 'object', error);
+        }
+
+        function onUIErrorEvent(errorEvent) {
+            // Extract the shaka.util.Error object from the event.
+            onPlayerError(event.detail);
+        }
+
+        function initFailed(errorEvent) {
+            // Handle the failure to load; errorEvent.detail.reasonCode has a
+            // shaka.ui.FailReasonCode describing why.
+            console.error('Unable to load the UI library!');
+        }
+
+        // Listen to the custom shaka-ui-loaded event, to wait until the UI is loaded.
+        document.addEventListener('shaka-ui-loaded', init);
+
+        // Listen to the custom shaka-ui-load-failed event, in case Shaka Player fails
+        // to load (e.g. due to lack of browser support).
+        document.addEventListener('shaka-ui-load-failed', initFailed);
+
+        async function playMedia() {
+            // Try to load a manifest.
+            // This is an asynchronous process.
+            try {
+                await player.load(document.getElementById('urlTextBox').value);
+                // This runs if the asynchronous load is successful.
+                console.log('The video has now been loaded!');
+            } catch (e) {
+                // onError is executed if the asynchronous load fails.
+                onPlayerError(e);
+            }
+        }
+
+        function onResize() {
+            const videoElement = document.getElementById('videoElement');
+            const playerHeightSpan = document.getElementById('playerHeightSpan');
+            const currentPlayerHeight = videoElement.clientHeight;
+            playerHeightSpan.innerHTML = `Player height: ${currentPlayerHeight} px`;
+
+            let maxDesiredHeight = currentPlayerHeight;
+            if (player) {
+                if (availableHeights && availableHeights.length) {
+                    // find the first height that is greater than the current player height
+                    for (let i = 0; i < availableHeights.length; i++) {
+                        if (availableHeights[i] >= maxDesiredHeight) {
+                            maxDesiredHeight = availableHeights[i];
+                            break;
+                        }
+                    }
+
+                    if (maxDesiredHeight) {
+                        player.configure({
+                            restrictions: {
+                                maxHeight: maxDesiredHeight
+                            },
+                        });
+                    }
+                }
+            }
+        }
+    </script>
+}
