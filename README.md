@@ -83,4 +83,4 @@ With this configuration, you can view your Adaptive Streamed Content in your app
 
 + [KeyCDN Article "MPEG-DASH - Dynamic Adaptive Streaming Over HTTP" Explained](https://www.keycdn.com/support/mpeg-dash)
 + [What is MPEG-DASH Video Streaming Protocol? How Does MPEG-DASH Work? by OTTVerse](https://ottverse.com/mpeg-dash-video-streaming-the-complete-guide/)
-+ [FFmpeg Recipes](https://ottverse.com/recipes-in-ffmpeg/)
++ [FFmpeg Recipes by OTTVerse](https://ottverse.com/recipes-in-ffmpeg/)
