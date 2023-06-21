@@ -34,7 +34,7 @@
             <p id="playerHeightSpan" />
         </div>
         <div data-shaka-player-container style="border: 1px solid gray;">
-            <video id="videoElement" data-shaka-player style="width:100%; height:100%" autoplay></video>
+            <video id="videoElement" data-shaka-player class="w-100 h-100" autoplay></video>
         </div>
     </div>
     <h4>Source Code:</h4>
@@ -78,6 +78,7 @@
         function onStreamingEvent() {
             if (player) {
                 const variants = player.getVariantTracks();
+                console.log(variants);
                 if (variants) {
                     availableHeights = variants.map(v => v.height).sort();
                 }
